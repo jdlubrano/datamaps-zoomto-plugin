@@ -20,7 +20,7 @@
         <button onclick="zoomOut();" id="zoomOut">Zoom Out</button>
         <script>
             var dm = new Datamap({
-                scope: 'usa',
+                // scope: 'usa',
                 element: document.getElementById('map')
             });
 
@@ -47,11 +47,11 @@
             };
 
             function zoomIn() {
-                dm.zoomto(null, zoomInOpts);
+                dm.zoomto(zoomInOpts);
             }
 
             function zoomOut() {
-                dm.zoomto(null, zoomOutOpts);
+                dm.zoomto(zoomOutOpts);
             }
 
         </script>

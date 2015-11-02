@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/1.6.19/topojson.min.js"></script>
+        <script src="../node_modules/datamaps/dist/datamaps.all.js"></script>
+        <script src="../src/datamaps-zoomto.js"></script>
+    </head>
+    <body>
+        <style>
+            #map {
+                position: relative;
+                margin: 0 auto;
+                width: 800px;
+                height: 450px;
+            }
+        </style>
+        <div id="map"></div>
+        <input type="text" id="centerLng" placeholder="Center Lng" />
+        <input type="text" id="centerLat" placeholder="Center Lat" />
+        <input type="text" id="scaleFactor" placeholder="Scale Factor" />
+        <input type="number" id="duration" placeholder="Transition Duration (ms)" />
+        <button onclick="applyZoom();" id="zoom">Apply Zoom</button>
+        <script>
+            var dm = new Datamap({
+                element: document.getElementById('map')
+            });
+
+            var applyZoom = function() {
+                var opts = {
+                    scaleFactor: document.getElementById('scaleFactor').value,
+                    center: {
+                        lat: document.getElementById('centerLat').value,
+                        lng: document.getElementById('centerLng').value
+                    },
+                    transition: {
+                        duration: document.getElementById('duration').value
+                    }
+                };
+                dm.zoomto(opts);
+            };
+        </script>
+    </body>
+</html>

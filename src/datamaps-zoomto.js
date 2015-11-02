@@ -6,7 +6,7 @@
 (function() {
   var PLUGIN_NAME = "zoomto";
   
-  var zoomtoPlugin = function(layer, data, options) {
+  var zoomtoPlugin = function(layer, options) {
     var self = this;
 
     var defaultOptions = {
@@ -20,12 +20,16 @@
       }
     };
 
-    var doingAnimation = false;
-    var timeout = null;
-    var transform = null;
+    var selection = function() {
+      return d3.select(self.options.element);
+    };
 
     var datamapsSubunits = function() {
-      return d3.select('.datamaps-subunits');
+      return selection().select('.datamaps-subunits');
+    };
+
+    var datamapsHoverover = function() {
+      return selection().select('.datamaps-hoverover');
     };
     
     var genTranslateStr = function(x, y) {
@@ -49,45 +53,33 @@
       return addition;
     };
 
+    /**
+     * Apply a d3 transition to animate a zoom effect.
+     */
     var animateZoom = function() {
       if(options.scaleFactor < 0) {
         throw Error('Cannot zoom to a negative scale');
       }
       
-      var centerCoordsXY = self.latLngToXY.apply(
-        self,
-        [options.center.lat, options.center.lng]
-      );
-
-      // self.projection.center() returns [lng, lat] but we need [lat, lng].
-      // Hence the reverse call
-      
+      var centerCoordsXY = self.latLngToXY(options.center.lat, options.center.lng);
+ 
+      // Assume that the old center will be at the center of the svg element
       var oldCenterCoordsXY = [
         self.options.element.offsetWidth / 2,
         self.options.element.offsetHeight / 2
       ];
 
-      // Calculate the XY translation for changing the center point
-      var c = {
-        x: oldCenterCoordsXY[0] - centerCoordsXY[0],
-        y: oldCenterCoordsXY[1] - centerCoordsXY[1]
-      };
-
-      // Retrieve the map's current translation
-      var t = {
-        x: self.projection.translate()[0],
-        y: self.projection.translate()[1]
-      };
-
       var s = options.scaleFactor;
 
-      // Calculate the overall desired translation accounting for scale
-      transform = {
+      // Calculate the overall desired translation accounting for scale.
+      // All we need to do is move from the old center point to the new
+      // center point and multiply by the scaling factor.
+      var t = {
         x: oldCenterCoordsXY[0] - s * (centerCoordsXY[0]),
         y: oldCenterCoordsXY[1] - s * (centerCoordsXY[1])
       };
 
-      var transformStr = genTranslateStr(transform.x, transform.y) + ' ' + genScaleStr(s);
+      var transformStr = genTranslateStr(t.x, t.y) + ' ' + genScaleStr(s);
 
       datamapsSubunits().transition()
         .duration(options.transition.duration)
@@ -95,6 +87,12 @@
       ;
     };
 
+    /**
+     * Redrawing the projection will allow other plugins to stay in sync
+     * with the Datamaps utility functions such as latLngToXY.  All we
+     * want to do is redraw the projection with the proper scale and translation
+     * such that the user never sees the map being replaced.
+     */
     var genProjection = function(element) {
       var s = options.scaleFactor;
       var projection = self.projection;
@@ -113,30 +111,24 @@
     };
 
     var reprojectMap = function() {
-      // handle rapid zooming
-      if(doingAnimation) {
-        clearTimeout(timeout);
-      }
+      // TODO: handle rapid zooming (i.e. someone keeps clicking the zoom
+      // button before the animation completes).
+      // Maybe we just put the burden on the developer using the plugin.
       // NOTE: self.options is the Datamap's options object not the options
       // parameter for this plugin.
       self.options.setProjection = genProjection;
       // Scale the map border lines otherwise they get too big or too small
       self.options.geographyConfig.borderWidth *= options.scaleFactor;
+      // Remove elements that will be redrawn to avoid polluting the DOM.
       datamapsSubunits().remove();
+      datamapsHoverover().remove();
       self.draw();
-      var c = self.projection.invert([400, 225]);
-      console.log(c);
-
     };
 
     // execute zoom
-    // d3.select(layer).remove();
     options = overrideProps(defaultOptions, options);
-    doingAnimation = true;
     animateZoom();
-    doingAnimation = false;
-    timeout = setTimeout(reprojectMap, options.transition.duration);
-    // reprojectMap();
+    setTimeout(reprojectMap, options.transition.duration);
   };
 
   if(Datamap !== undefined) {
@@ -147,4 +139,3 @@
   return zoomtoPlugin;
 
 }());
-
