@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/1.6.19/topojson.min.js"></script>
+        <script src="../node_modules/datamaps/dist/datamaps.all.js"></script>
+        <script src="../node_modules/svg.js/dist/svg.js"></script>
+        <script src="../src/datamaps-zoomto.js"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/css/bootstrap.css" />
+    </head>
+    <body>
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-8 col-md-offset-2 col-xs-12">
+                    <div id="map"></div>
+                </div>
+            </div>
+        </div>
+        <button onclick="zoomIn();" id="zoomIn">Zoom In</button>
+        <button onclick="zoomOut();" id="zoomOut">Zoom Out</button>
+        <script>
+            var dm = new Datamap({
+                scope: 'usa',
+                element: document.getElementById('map'),
+                responsive: true
+            });
+
+            window.addEventListener('resize', function() {
+                dm.resize();
+            });
+
+            var zoomInOpts = {
+                scaleFactor: 2,
+                center: {
+                    lat: 45,
+                    lng: -90
+                },
+                transition: {
+                    duration: 1000
+                }
+            };
+
+            var zoomOutOpts = {
+                scaleFactor: 0.5,
+                center: {
+                    lat: 40,
+                    lng: -90
+                },
+                transition: {
+                    duration: 1000
+                }
+            };
+
+            function zoomIn() {
+                dm.zoomto(zoomInOpts);
+            }
+
+            function zoomOut() {
+                dm.zoomto(zoomOutOpts);
+            }
+
+        </script>
+    </body>
+</html>
