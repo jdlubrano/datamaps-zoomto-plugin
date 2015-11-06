@@ -25,7 +25,8 @@
     };
 
     var datamapsSubunits = function() {
-      return selection().select('.datamaps-subunits');
+      // return selection().select('.datamaps-subunits');
+      return selection().selectAll('svg>g');
     };
 
     var datamapsHoverover = function() {
@@ -36,8 +37,9 @@
       return 'translate(' + x + ',' + y + ')';
     };
 
-    var genScaleStr = function(scaleFactor) {
-      return 'scale(' + scaleFactor + ')';
+    var genScaleStr = function(x, y) {
+      if(y === undefined) y = x;
+      return 'scale(' + x + ',' + y + ')';
     };
     
     var overrideProps = function(orig, addition) {
@@ -79,7 +81,12 @@
         y: oldCenterCoordsXY[1] - s * (centerCoordsXY[1])
       };
 
-      var transformStr = genTranslateStr(t.x, t.y) + ' ' + genScaleStr(s);
+      var transformStr = genTranslateStr(t.x, t.y) + genScaleStr(s);
+
+      datamapsSubunits().attr('data-zoomto-scale', s)
+        .attr('data-zoomto-tx', t.x)
+        .attr('data-zoomto-ty', t.y)
+      ;
 
       datamapsSubunits().transition()
         .duration(options.transition.duration)
@@ -125,13 +132,75 @@
       self.draw();
     };
 
+    var parseTranslate = function(transformStr) {
+      var translateRegex = /translate\(\s*(-?\d*\.?\d*)\s*,\s*(-?\d*\.?\d*)\s*\)/gi;
+      var translateResult = translateRegex.exec(transformStr);
+      var t = {
+        x: 0,
+        y: 0
+      };
+      if(translateResult) {
+        t.x = +translateResult[1];
+        t.y = +translateResult[2];
+      }
+      console.log(t);
+      return t;
+    };
+
+    var resize = function() {
+      if(this.options.responsive) {
+        var newsize = this.options.element.clientWidth;
+        var svg = d3.select(this.options.element).select('svg');
+        var oldsize = svg.attr('data-width');
+        var resizeScaleFactor = newsize / oldsize;
+        datamapsSubunits().attr('transform', function() {
+          var sel = d3.select(this);
+          var zoomScale = sel.attr('data-zoomto-scale');
+          var transform = {
+            translate: {
+              x: resizeScaleFactor * sel.attr('data-zoomto-tx'),
+              y: resizeScaleFactor * sel.attr('data-zoomto-ty')
+            },
+            scale: {
+              x: resizeScaleFactor * zoomScale,
+              y: resizeScaleFactor * zoomScale
+            }
+          };
+
+          var transformStr = genTranslateStr(
+            transform.translate.x,
+            transform.translate.y
+          ) + genScaleStr(
+            transform.scale.x,
+            transform.scale.y
+          );
+
+          return transformStr;
+        });
+      }
+    };
+
     // execute zoom
+    self.resize = resize.bind(self);
     options = overrideProps(defaultOptions, options);
     animateZoom();
-    setTimeout(reprojectMap, options.transition.duration);
+    // setTimeout(reprojectMap, options.transition.duration);
   };
 
   if(Datamap !== undefined) {
+    // redefine resize prototype
+    // Datamap.prototype.resize = function() {
+    //   var self = this;
+    //   if(self.options.responsive) {
+    //     var newsize = self.options.element.clientWidth;
+    //     var oldsize = d3.select(self.options.element).select('svg').attr('data-width');
+    //     d3.select(self.options.element)
+    //       .select('svg')
+    //       .selectAll('g')
+    //       .attr('transform', 'scale(' + (newsize / oldsize) + ')')
+    //     ;
+    //   }
+    // };
     var dm = new Datamap({ element: document.createElement('div') });
     dm.addPlugin(PLUGIN_NAME, zoomtoPlugin);
   }

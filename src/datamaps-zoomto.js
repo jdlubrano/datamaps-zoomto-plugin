@@ -25,7 +25,8 @@
     };
 
     var datamapsSubunits = function() {
-      return selection().select('.datamaps-subunits');
+      // return selection().select('.datamaps-subunits');
+      return selection().selectAll('svg>g');
     };
 
     var datamapsHoverover = function() {
@@ -80,7 +81,7 @@
         y: oldCenterCoordsXY[1] - s * (centerCoordsXY[1])
       };
 
-      var transformStr = genTranslateStr(t.x, t.y) + ' ' + genScaleStr(s);
+      var transformStr = genTranslateStr(t.x, t.y) + genScaleStr(s);
 
       datamapsSubunits().attr('data-zoomto-scale', s)
         .attr('data-zoomto-tx', t.x)
@@ -146,48 +147,27 @@
       return t;
     };
 
-    var parseScale = function(transformStr) {
-      console.log(transformStr);
-      var s = { x: 1, y: 1 };
-      var singleScaleRegex = /scale\(\s*(\d*\.?\d*)\s*\)/gi;
-      var scaleResult = singleScaleRegex.exec(transformStr);
-      if(scaleResult) {
-        s.x = s.y = scaleResult[1];
-      } else {
-        var multiScaleRegex = /scale\(\s*(\d*\.?\d*)\s*,\s*(\d*\.?\d*)\s*\)/gi;
-        scaleResult = multiScaleRegex.exec(transformStr);
-        if(scaleResult) {
-          s.x = scaleResult[1];
-          s.y = scaleResult[2];
-        }
-      }
-      return s;
-    };
-
-    var parseTransform = function(transformStr) {
-      var transform = {
-        scale: parseScale(transformStr),
-        translate: parseTranslate(transformStr)
-      };
-      console.log(transform);
-      return transform;
-    };
-
     var resize = function() {
       if(this.options.responsive) {
         var newsize = this.options.element.clientWidth;
         var svg = d3.select(this.options.element).select('svg');
         var oldsize = svg.attr('data-width');
         var resizeScaleFactor = newsize / oldsize;
-        svg.selectAll('g').attr('transform', function() {
+        datamapsSubunits().attr('transform', function() {
           var sel = d3.select(this);
-          var transformStr = sel.attr('transform');
-          var transform = parseTransform(transformStr);
           var zoomScale = sel.attr('data-zoomto-scale');
-          transform.scale.x = resizeScaleFactor * zoomScale;
-          transform.scale.y = resizeScaleFactor * zoomScale;
+          var transform = {
+            translate: {
+              x: resizeScaleFactor * sel.attr('data-zoomto-tx'),
+              y: resizeScaleFactor * sel.attr('data-zoomto-ty')
+            },
+            scale: {
+              x: resizeScaleFactor * zoomScale,
+              y: resizeScaleFactor * zoomScale
+            }
+          };
 
-          transformStr = genTranslateStr(
+          var transformStr = genTranslateStr(
             transform.translate.x,
             transform.translate.y
           ) + genScaleStr(
@@ -201,7 +181,6 @@
     };
 
     // execute zoom
-    console.log(self);
     self.resize = resize.bind(self);
     options = overrideProps(defaultOptions, options);
     animateZoom();
