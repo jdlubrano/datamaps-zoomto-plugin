@@ -9,6 +9,10 @@
   var zoomtoPlugin = function(layer, options) {
     var self = this;
 
+    if(self.resizeScaleFactor === undefined) {
+      self.resizeScaleFactor = 1;
+    }
+
     var defaultOptions = {
       scaleFactor: 1, // no scale
       center: {
@@ -55,10 +59,17 @@
       return addition;
     };
 
+    var calculateResizeFactor = function() {
+      var newsize = self.options.element.clientWidth;
+      var svg = d3.select(self.options.element).select('svg');
+      var oldsize = svg.attr('data-width');
+      return newsize / oldsize;
+    };
+
     /**
      * Apply a d3 transition to animate a zoom effect.
      */
-    var animateZoom = function() {
+    var animateZoom = function(duration) {
       if(options.scaleFactor < 0) {
         throw Error('Cannot zoom to a negative scale');
       }
@@ -71,7 +82,7 @@
         self.options.element.offsetHeight / 2
       ];
 
-      var s = options.scaleFactor;
+      var s = options.scaleFactor * calculateResizeFactor();
 
       // Calculate the overall desired translation accounting for scale.
       // All we need to do is move from the old center point to the new
@@ -83,53 +94,10 @@
 
       var transformStr = genTranslateStr(t.x, t.y) + genScaleStr(s);
 
-      datamapsSubunits().attr('data-zoomto-scale', s)
-        .attr('data-zoomto-tx', t.x)
-        .attr('data-zoomto-ty', t.y)
-      ;
-
       datamapsSubunits().transition()
-        .duration(options.transition.duration)
+        .duration(duration)
         .attr('transform', transformStr)
       ;
-    };
-
-    /**
-     * Redrawing the projection will allow other plugins to stay in sync
-     * with the Datamaps utility functions such as latLngToXY.  All we
-     * want to do is redraw the projection with the proper scale and translation
-     * such that the user never sees the map being replaced.
-     */
-    var genProjection = function(element) {
-      var s = options.scaleFactor;
-      var projection = self.projection;
-      var translate = projection.translate();
-      var centerXY = self.latLngToXY(options.center.lat, options.center.lng);
-      var t = {
-        x: (element.offsetWidth / 2) + s * (translate[0] - centerXY[0]),
-        y: (element.offsetHeight / 2) + s * (translate[1] - centerXY[1])
-      };
-
-      var scale = projection.scale() * s;
-      var proj = projection.translate([t.x, t.y]).scale(scale);
-      var path = d3.geo.path().projection(proj);
-
-      return { path: path, projection: proj };
-    };
-
-    var reprojectMap = function() {
-      // TODO: handle rapid zooming (i.e. someone keeps clicking the zoom
-      // button before the animation completes).
-      // Maybe we just put the burden on the developer using the plugin.
-      // NOTE: self.options is the Datamap's options object not the options
-      // parameter for this plugin.
-      self.options.setProjection = genProjection;
-      // Scale the map border lines otherwise they get too big or too small
-      self.options.geographyConfig.borderWidth *= options.scaleFactor;
-      // Remove elements that will be redrawn to avoid polluting the DOM.
-      datamapsSubunits().remove();
-      datamapsHoverover().remove();
-      self.draw();
     };
 
     var parseTranslate = function(transformStr) {
@@ -149,58 +117,17 @@
 
     var resize = function() {
       if(this.options.responsive) {
-        var newsize = this.options.element.clientWidth;
-        var svg = d3.select(this.options.element).select('svg');
-        var oldsize = svg.attr('data-width');
-        var resizeScaleFactor = newsize / oldsize;
-        datamapsSubunits().attr('transform', function() {
-          var sel = d3.select(this);
-          var zoomScale = sel.attr('data-zoomto-scale');
-          var transform = {
-            translate: {
-              x: resizeScaleFactor * sel.attr('data-zoomto-tx'),
-              y: resizeScaleFactor * sel.attr('data-zoomto-ty')
-            },
-            scale: {
-              x: resizeScaleFactor * zoomScale,
-              y: resizeScaleFactor * zoomScale
-            }
-          };
-
-          var transformStr = genTranslateStr(
-            transform.translate.x,
-            transform.translate.y
-          ) + genScaleStr(
-            transform.scale.x,
-            transform.scale.y
-          );
-
-          return transformStr;
-        });
+        animateZoom(0);
       }
     };
 
     // execute zoom
     self.resize = resize.bind(self);
     options = overrideProps(defaultOptions, options);
-    animateZoom();
-    // setTimeout(reprojectMap, options.transition.duration);
+    animateZoom(options.transition.duration);
   };
 
   if(Datamap !== undefined) {
-    // redefine resize prototype
-    // Datamap.prototype.resize = function() {
-    //   var self = this;
-    //   if(self.options.responsive) {
-    //     var newsize = self.options.element.clientWidth;
-    //     var oldsize = d3.select(self.options.element).select('svg').attr('data-width');
-    //     d3.select(self.options.element)
-    //       .select('svg')
-    //       .selectAll('g')
-    //       .attr('transform', 'scale(' + (newsize / oldsize) + ')')
-    //     ;
-    //   }
-    // };
     var dm = new Datamap({ element: document.createElement('div') });
     dm.addPlugin(PLUGIN_NAME, zoomtoPlugin);
   }
