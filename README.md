@@ -15,7 +15,7 @@ and running `grunt` will build the source code.  The original and minified
 versions will be present in the `build` directory.
 
 ### NPM
-Run `npm install datamaps-zoomto`.  The source will then be located in 
+Run `npm install datamaps-zoomto`.  The source will then be located in
 `node_modules/datamaps-zoomto/build`.
 
 ## Sample Usage
@@ -34,6 +34,15 @@ var zoomOpts = {
     },
     transition: {
         duration: 1000 // milliseconds
+    },
+    onZoomComplete: function (zoomData) {
+      // Called after zoomto completes.  Bound to the Datamaps instance.
+      // Passes one argument, zoomData.
+      // zoomData = {
+      //   translate: { x: <number>, y: <number> },
+      //   scale: <number>
+      // }
+      // no-op by default
     }
 };
 

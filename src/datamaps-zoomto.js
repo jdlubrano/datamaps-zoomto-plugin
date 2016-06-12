@@ -5,7 +5,7 @@
 
 (function() {
   var PLUGIN_NAME = "zoomto";
-  
+
   var zoomtoPlugin = function(layer, options) {
     var self = this;
 
@@ -21,7 +21,8 @@
       },
       transition: {
         duration: 1000
-      }
+      },
+      onZoomComplete: function() {}
     };
 
     var selection = function() {
@@ -36,7 +37,7 @@
     var datamapsHoverover = function() {
       return selection().select('.datamaps-hoverover');
     };
-    
+
     var genTranslateStr = function(x, y) {
       return 'translate(' + x + ',' + y + ')';
     };
@@ -45,9 +46,9 @@
       if(y === undefined) y = x;
       return 'scale(' + x + ',' + y + ')';
     };
-    
+
     var overrideProps = function(orig, addition) {
-      // add the properties from orig that 
+      // add the properties from orig that
       // do not already exist in addition.
       for(var prop in orig) {
         if(typeof orig[prop] === "object" && addition[prop]) {
@@ -73,9 +74,9 @@
       if(options.scaleFactor < 0) {
         throw Error('Cannot zoom to a negative scale');
       }
-      
+
       var centerCoordsXY = self.latLngToXY(options.center.lat, options.center.lng);
- 
+
       // Assume that the old center will be at the center of the svg element
       var oldCenterCoordsXY = [
         self.options.element.offsetWidth / 2,
@@ -98,21 +99,11 @@
         .duration(duration)
         .attr('transform', transformStr)
       ;
-    };
 
-    var parseTranslate = function(transformStr) {
-      var translateRegex = /translate\(\s*(-?\d*\.?\d*)\s*,\s*(-?\d*\.?\d*)\s*\)/gi;
-      var translateResult = translateRegex.exec(transformStr);
-      var t = {
-        x: 0,
-        y: 0
-      };
-      if(translateResult) {
-        t.x = +translateResult[1];
-        t.y = +translateResult[2];
-      }
-      console.log(t);
-      return t;
+      options.onZoomComplete.call(self, {
+        translate: t,
+        scale: s
+      });
     };
 
     var resize = function() {
@@ -121,9 +112,11 @@
       }
     };
 
-    // execute zoom
     self.resize = resize.bind(self);
+
     options = overrideProps(defaultOptions, options);
+
+    // execute zoom
     animateZoom(options.transition.duration);
   };
 

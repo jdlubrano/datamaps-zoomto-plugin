@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/1.6.19/topojson.min.js"></script>
+        <script src="../node_modules/datamaps/dist/datamaps.all.js"></script>
+        <script src="../src/datamaps-zoomto.js"></script>
+    </head>
+    <body>
+        <style>
+            #map {
+                position: relative;
+                margin: 0 auto;
+                width: 800px;
+                height: 450px;
+            }
+        </style>
+        <div id="map"></div>
+        <button onclick="zoomIn();" id="zoomIn">Zoom In</button>
+        <button onclick="zoomOut();" id="zoomOut">Zoom Out</button>
+        <script>
+            var dm = new Datamap({
+              // scope: 'usa',
+              element: document.getElementById('map')
+            });
+
+            // Keep a reference to the d3 zoom behavior
+            var zoom = d3.behavior.zoom();
+            var currentZoom = null;
+
+            // Reset d3.event.translate and d3.event.scale
+            function resetZoom() {
+              zoom.scale(1);
+              zoom.translate([0, 0]);
+            }
+
+            var zoomInOpts = {
+              scaleFactor: 2,
+              center: {
+                lat: 45,
+                lng: -90
+              },
+              transition: {
+                duration: 1000
+              },
+              onZoomComplete: function(zoomData) {
+                // zoomData = {
+                //   translate: { x, y },
+                //   scale: <number>
+                // }
+                currentZoom = zoomData;
+                resetZoom();
+              }
+            };
+
+            var zoomOutOpts = {
+              scaleFactor: 0.5,
+              center: {
+                lat: 40,
+                lng: -90
+              },
+              transition: {
+                duration: 1000
+              },
+              onZoomComplete: function(zoomData) {
+                currentZoom = zoomData;
+                resetZoom();
+              }
+            };
+
+            function zoomIn() {
+              dm.zoomto(zoomInOpts);
+            }
+
+            function zoomOut() {
+              dm.zoomto(zoomOutOpts);
+            }
+
+            dm.svg.call(zoom.on("zoom", redraw)); // on mousewheel
+
+            function transformStr(x, y, scale) {
+              return "translate(" + [translateX, translateY] + ")scale(" + scale + ")";
+            }
+
+            function redraw() {
+              var translateX = d3.event.translate[0];
+              var translateY = d3.event.translate[1];
+              var scale = d3.event.scale;
+
+              if (currentZoom) {
+                scale *= currentZoom.scale;
+                translateX += currentZoom.translate.x
+                translateY += currentZoom.translate.y;
+              }
+
+              dm.svg.selectAll("g")
+                .attr("transform", transformStr(translateX, translateY, scale))
+              ;
+            }
+        </script>
+    </body>
+</html>
+
