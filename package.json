@@ -1,6 +1,6 @@
 {
   "name": "datamaps-zoomto",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A Datamaps plugin that enables zooming to arbitrary coordinates at an arbitrary zoom level.",
   "main": "build/datamaps-zoomto.js",
   "scripts": {
