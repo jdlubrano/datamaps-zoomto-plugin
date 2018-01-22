@@ -1,5 +1,7 @@
 # Datamaps Zoom-to Plugin
 
+[![Build Status](https://travis-ci.org/jdlubrano/datamaps-zoomto-plugin.svg?branch=master)](https://travis-ci.org/jdlubrano/datamaps-zoomto-plugin)
+
 ## Contributors
 * Joel Lubrano
 
