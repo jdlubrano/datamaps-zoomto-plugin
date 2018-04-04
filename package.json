@@ -4,7 +4,8 @@
   "description": "A Datamaps plugin that enables zooming to arbitrary coordinates at an arbitrary zoom level.",
   "main": "build/datamaps-zoomto.js",
   "scripts": {
-    "test": "grunt test"
+    "test": "grunt test",
+    "build": "grunt"
   },
   "repository": {
     "type": "git",

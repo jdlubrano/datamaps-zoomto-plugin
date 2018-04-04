@@ -73,6 +73,7 @@ module.exports = function(grunt) {
 
   // Default task(s).
   grunt.registerTask('default', ['test', 'copy', 'uglify']);
+  grunt.registerTask('build', ['copy', 'uglify']);
   grunt.registerTask('test', ['jasmine:dev']);
 
   // To be run after re-versioning
