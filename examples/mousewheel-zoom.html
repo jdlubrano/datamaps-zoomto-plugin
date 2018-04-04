@@ -79,7 +79,7 @@
             dm.svg.call(zoom.on("zoom", redraw)); // on mousewheel
 
             function transformStr(x, y, scale) {
-              return "translate(" + [translateX, translateY] + ")scale(" + scale + ")";
+              return "translate(" + [x, y] + ")scale(" + scale + ")";
             }
 
             function redraw() {
