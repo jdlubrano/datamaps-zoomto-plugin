@@ -3,7 +3,7 @@
 
 "use strict";
 
-(function() {
+(function(window) {
   var PLUGIN_NAME = "zoomto";
 
   function isDefined(val) {
@@ -141,11 +141,21 @@
     animateZoom(options.transition.duration);
   };
 
-  if(Datamap !== undefined) {
+  if (typeof exports === 'object') {
+    var Datamap = require('datamaps');
+
     var dm = new Datamap({ element: document.createElement('div') });
+    dm.addPlugin(PLUGIN_NAME, zoomtoPlugin);
+
+    module.exports = zoomtoPlugin;
+  } else {
+    if (typeof Datamap === 'undefined') {
+      throw new Error('The Datamaps library is required before you can use the zoomto plugin.');
+    }
+
+    dm = new Datamap({ element: document.createElement('div') });
     dm.addPlugin(PLUGIN_NAME, zoomtoPlugin);
   }
 
   return zoomtoPlugin;
-
 }());
