@@ -55,10 +55,30 @@ dm.zoomto(zoomOpts);
 
 // Of course, using the default zoom will not actually zoom due to a 1:1 scale
 // and the center of the map not changing.
-
 ```
 
 Also see `examples/basic.html`.
+
+### Using with Webpack
+
+It is also pretty easy to use this plugin in a Webpack bundle.  See
+the `webpack-example` directory for details.
+
+```javascript
+const Datamaps = require('datamaps');
+require('datamaps-zoomto');
+
+var dm = new Datamaps({
+  element: document.getElementById('map')
+});
+
+dm.zoomto({
+  scaleFactor: 2,
+  transition: {
+    duration: 1000
+  }
+});
+```
 
 ## Dependencies
 See `package.json`.
