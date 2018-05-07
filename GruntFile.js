@@ -34,10 +34,7 @@ module.exports = function(grunt) {
             'node_modules/datamaps/dist/datamaps.all.js'
           ],
           specs: [
-            'tests/spec/DefinedWithDatamapsSpec.js' /*,
-            'tests/spec/*Spec.js',
-            'tests/spec/SpecRunner*.html'
-            */
+            'test/*.spec.js'
           ]
         }
       }

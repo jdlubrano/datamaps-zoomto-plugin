@@ -21,7 +21,8 @@ Run `npm install datamaps-zoomto`.  The source will then be located in
 `node_modules/datamaps-zoomto/build`.
 
 ## Sample Usage
-```
+
+```javascript
 // Create a Datamap instance
 var dm = new Datamap({
     element: document.getElementById('map')
@@ -31,8 +32,9 @@ var dm = new Datamap({
 var zoomOpts = {
     scaleFactor: 1, // The amount to zoom
     center: {
-        lat: 0, // latitude of the point to which you wish to zoom
-        lng: 0, // longitude of the point to which you wish to zoom
+        lat: <the center of your original map>, // latitude of the point to which you wish to zoom
+        lng: <the center of your orignal map>, // longitude of the point to which you wish to zoom
+        // NOTE: You cannot specify lat without lng or lng without lat.  It's all or nothing.
     },
     transition: {
         duration: 1000 // milliseconds
@@ -52,7 +54,7 @@ var zoomOpts = {
 dm.zoomto(zoomOpts);
 
 // Of course, using the default zoom will not actually zoom due to a 1:1 scale
-// and a (0,0) center.
+// and the center of the map not changing.
 
 ```
 
