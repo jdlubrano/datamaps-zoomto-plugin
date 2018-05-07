@@ -34,28 +34,19 @@ module.exports = function(grunt) {
             'node_modules/datamaps/dist/datamaps.all.js'
           ],
           specs: [
-            'tests/spec/DefinedWithDatamapsSpec.js' /*,
-            'tests/spec/*Spec.js',
-            'tests/spec/SpecRunner*.html'
-            */
+            'test/*.spec.js'
           ]
         }
       }
     },
     version: {
       project: {
-        src: ['package.json', 'package.js']
+        src: ['package.json']
       }
     },
     shell: {
       options: {
         failOnError: true,
-      },
-      meteor_test: {
-        command: "node_modules/.bin/spacejam test-packages ./"
-      },
-      meteor_publish: {
-        command: "meteor publish"
       },
       npm_publish: {
         command: "npm publish"
@@ -73,6 +64,7 @@ module.exports = function(grunt) {
 
   // Default task(s).
   grunt.registerTask('default', ['test', 'copy', 'uglify']);
+  grunt.registerTask('build', ['copy', 'uglify']);
   grunt.registerTask('test', ['jasmine:dev']);
 
   // To be run after re-versioning

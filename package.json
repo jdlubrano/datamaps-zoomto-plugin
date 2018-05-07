@@ -1,10 +1,12 @@
 {
   "name": "datamaps-zoomto",
-  "version": "0.0.3",
+  "version": "0.1.0",
   "description": "A Datamaps plugin that enables zooming to arbitrary coordinates at an arbitrary zoom level.",
   "main": "build/datamaps-zoomto.js",
   "scripts": {
-    "test": "grunt test"
+    "test": "grunt test",
+    "mocha": "mocha test/require.test.js",
+    "build": "grunt"
   },
   "repository": {
     "type": "git",
@@ -22,21 +24,20 @@
   },
   "homepage": "https://github.com/jdlubrano/datamaps-zoomto-plugin#readme",
   "devDependencies": {
-    "grunt": "^0.4.5",
-    "grunt-contrib-clean": "^0.6.0",
-    "grunt-contrib-copy": "^0.8.1",
-    "grunt-contrib-jasmine": "^0.9.2",
-    "grunt-contrib-uglify": "^0.9.2",
+    "grunt": "^1.0.0",
+    "grunt-contrib-clean": "^1.0.0",
+    "grunt-contrib-copy": "^1.0.0",
+    "grunt-contrib-jasmine": "^1.0.0",
+    "grunt-contrib-uglify": "^1.0.0",
     "grunt-shell": "^1.1.2",
     "grunt-text-replace": "^0.4.0",
     "grunt-version": "^1.0.0",
     "jasmine-jquery": "^2.1.1",
-    "jquery": "~> 3.0.0",
-    "spacejam": "^1.2.2"
+    "jquery": "~> 3.0.0"
   },
   "dependencies": {
     "d3": "^3.5.6",
-    "datamaps": "^0.4.0",
+    "datamaps": "^0.4.4",
     "topojson": "^1.6.26"
   }
 }

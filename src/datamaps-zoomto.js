@@ -6,6 +6,10 @@
 (function() {
   var PLUGIN_NAME = "zoomto";
 
+  function isDefined(val) {
+    return val !== null && val !== undefined;
+  }
+
   var zoomtoPlugin = function(layer, options) {
     var self = this;
 
@@ -16,8 +20,8 @@
     var defaultOptions = {
       scaleFactor: 1, // no scale
       center: {
-        lat: 0,
-        lng: 0
+        lat: null,
+        lng: null
       },
       transition: {
         duration: 1000
@@ -75,13 +79,30 @@
         throw Error('Cannot zoom to a negative scale');
       }
 
-      var centerCoordsXY = self.latLngToXY(options.center.lat, options.center.lng);
-
       // Assume that the old center will be at the center of the svg element
-      var oldCenterCoordsXY = [
-        self.options.element.offsetWidth / 2,
-        self.options.element.offsetHeight / 2
-      ];
+      var oldCenterCoords = {
+        x: self.options.element.offsetWidth / 2,
+        y: self.options.element.offsetHeight / 2
+      };
+
+      var centerCoords = {
+        x: oldCenterCoords.x,
+        y: oldCenterCoords.y
+      };
+
+      if (isDefined(options.center.lng) && isDefined(options.center.lng)) {
+        var coords = self.latLngToXY(options.center.lat, options.center.lng);
+
+        if (coords === null) {
+          throw new Error(
+            'The latitude/longitude coordinates that you tried to use as your' +
+            ' center are outside the bounds of your projection (your map).'
+          );
+        }
+
+        centerCoords.x = coords[0];
+        centerCoords.y = coords[1];
+      }
 
       var s = options.scaleFactor * calculateResizeFactor();
 
@@ -89,8 +110,8 @@
       // All we need to do is move from the old center point to the new
       // center point and multiply by the scaling factor.
       var t = {
-        x: oldCenterCoordsXY[0] - s * (centerCoordsXY[0]),
-        y: oldCenterCoordsXY[1] - s * (centerCoordsXY[1])
+        x: oldCenterCoords.x - s * (centerCoords.x),
+        y: oldCenterCoords.y - s * (centerCoords.y)
       };
 
       var transformStr = genTranslateStr(t.x, t.y) + genScaleStr(s);
@@ -120,11 +141,21 @@
     animateZoom(options.transition.duration);
   };
 
-  if(Datamap !== undefined) {
+  if (typeof exports === 'object') {
+    var Datamap = require('datamaps');
+
     var dm = new Datamap({ element: document.createElement('div') });
+    dm.addPlugin(PLUGIN_NAME, zoomtoPlugin);
+
+    module.exports = zoomtoPlugin;
+  } else {
+    if (typeof window.Datamap === 'undefined') {
+      throw new Error('The Datamaps library is required before you can use the zoomto plugin.');
+    }
+
+    dm = new window.Datamap({ element: document.createElement('div') });
     dm.addPlugin(PLUGIN_NAME, zoomtoPlugin);
   }
 
   return zoomtoPlugin;
-
 }());
