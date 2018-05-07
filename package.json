@@ -18,7 +18,7 @@
     "zoom"
   ],
   "author": "Joel Lubrano",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/jdlubrano/datamaps-zoomto-plugin/issues"
   },
