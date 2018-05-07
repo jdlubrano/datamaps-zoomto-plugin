@@ -3,7 +3,7 @@
 
 "use strict";
 
-(function(window) {
+(function() {
   var PLUGIN_NAME = "zoomto";
 
   function isDefined(val) {
@@ -149,11 +149,12 @@
 
     module.exports = zoomtoPlugin;
   } else {
-    if (typeof Datamap === 'undefined') {
+    debugger;
+    if (typeof window.Datamap === 'undefined') {
       throw new Error('The Datamaps library is required before you can use the zoomto plugin.');
     }
 
-    dm = new Datamap({ element: document.createElement('div') });
+    dm = new window.Datamap({ element: document.createElement('div') });
     dm.addPlugin(PLUGIN_NAME, zoomtoPlugin);
   }
 
