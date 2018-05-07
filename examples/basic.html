@@ -16,6 +16,7 @@
             }
         </style>
         <div id="map"></div>
+        <button onclick="zoomToCenter();" id="zoomToCenter">Zoom To Center</button>
         <button onclick="zoomIn();" id="zoomIn">Zoom In</button>
         <button onclick="zoomOut();" id="zoomOut">Zoom Out</button>
         <script>
@@ -46,6 +47,15 @@
                 }
             };
 
+            function zoomToCenter() {
+              dm.zoomto({
+                scaleFactor: 2,
+                transition: {
+                  duration: 1000
+                }
+              });
+            }
+
             function zoomIn() {
                 dm.zoomto(zoomInOpts);
             }
@@ -53,7 +63,6 @@
             function zoomOut() {
                 dm.zoomto(zoomOutOpts);
             }
-
         </script>
     </body>
 </html>
