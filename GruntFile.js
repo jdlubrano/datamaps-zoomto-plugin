@@ -44,18 +44,12 @@ module.exports = function(grunt) {
     },
     version: {
       project: {
-        src: ['package.json', 'package.js']
+        src: ['package.json']
       }
     },
     shell: {
       options: {
         failOnError: true,
-      },
-      meteor_test: {
-        command: "node_modules/.bin/spacejam test-packages ./"
-      },
-      meteor_publish: {
-        command: "meteor publish"
       },
       npm_publish: {
         command: "npm publish"
