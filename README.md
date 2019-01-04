@@ -78,6 +78,24 @@ dm.zoomto({
     duration: 1000
   }
 });
+
+// or using ES6 import syntax
+
+import Datamaps from 'datamaps';
+import zoomto from 'datamaps-zoomto';
+
+var dm = new Datamaps({
+  element: document.getElementById('map')
+});
+
+dm.addPlugin('zoomto', zoomto);
+
+dm.zoomto({
+  scaleFactor: 2,
+  transition: {
+    duration: 1000
+  }
+});
 ```
 
 ## Dependencies
