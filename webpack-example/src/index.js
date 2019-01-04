@@ -1,10 +1,12 @@
-var Datamaps = require('datamaps');
-var zoomto = require('datamaps-zoomto');
+import Datamaps from "datamaps";
+import zoomto from "datamaps-zoomto";
 
 var dm = new Datamaps({
   // scope: 'usa',
   element: document.getElementById('map')
 });
+
+dm.addPlugin('zoomto', zoomto);
 
 var zoomInOpts = {
   scaleFactor: 2,
