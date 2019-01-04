@@ -7,4 +7,4 @@ npm install
 npm start
 ```
 
-View `basic.html` in a web browser at http://localhost:8080/basic.html.
+View `index.html` in a web browser at http://localhost:8080.
