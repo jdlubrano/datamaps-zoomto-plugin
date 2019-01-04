@@ -24,10 +24,10 @@
   },
   "homepage": "https://github.com/jdlubrano/datamaps-zoomto-plugin#readme",
   "devDependencies": {
-    "grunt": "^1.0.0",
+    "grunt": "^1.0.3",
     "grunt-contrib-clean": "^1.0.0",
     "grunt-contrib-copy": "^1.0.0",
-    "grunt-contrib-jasmine": "^1.0.0",
+    "grunt-contrib-jasmine": "^2.0.3",
     "grunt-contrib-uglify": "^1.0.0",
     "grunt-shell": "^1.1.2",
     "grunt-text-replace": "^0.4.0",

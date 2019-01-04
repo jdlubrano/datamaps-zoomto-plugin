@@ -149,7 +149,6 @@
 
     module.exports = zoomtoPlugin;
   } else {
-    debugger;
     if (typeof window.Datamap === 'undefined') {
       throw new Error('The Datamaps library is required before you can use the zoomto plugin.');
     }
